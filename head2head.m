@@ -1,26 +1,26 @@
-   function varargout = Questionbuilder(varargin)
-% QUESTIONBUILDER MATLAB code for Questionbuilder.fig
-%      QUESTIONBUILDER, by itself, creates a new QUESTIONBUILDER or raises the existing
+   function varargout = head2head(varargin)
+% head2head MATLAB code for head2head.fig
+%      head2head, by itself, creates a new head2head or raises the existing
 %      singleton*.
 %
-%      H = QUESTIONBUILDER returns the handle to a new QUESTIONBUILDER or the handle to
+%      H = head2head returns the handle to a new head2head or the handle to
 %      the existing singleton*.
 %
-%      QUESTIONBUILDER('CALLBACK',hObject,eventData,handles,...) calls the local
-%      function named CALLBACK in QUESTIONBUILDER.M with the given input arguments.
+%      head2head('CALLBACK',hObject,eventData,handles,...) calls the local
+%      function named CALLBACK in head2head.M with the given input arguments.
 %
-%      QUESTIONBUILDER('Property','Value',...) creates a new QUESTIONBUILDER or raises the
+%      head2head('Property','Value',...) creates a new head2head or raises the
 %      existing singleton*.  Starting from the left, property value pairs are
-%      applied to the GUI before Questionbuilder_OpeningFcn gets called.  An
+%      applied to the GUI before head2head_OpeningFcn gets called.  An
 %      unrecognized property name or invalid value makes property application
-%      stop.  All inputs are passed to Questionbuilder_OpeningFcn via varargin.
+%      stop.  All inputs are passed to head2head_OpeningFcn via varargin.
 %
 %      *See GUI Options on GUIDE's Tools menu.  Choose "GUI allows only one
 %      instance to run (singleton)".
 %
 % See also: GUIDE, GUIDATA, GUIHANDLES
 
-% Edit the above text to modify the response to help Questionbuilder
+% Edit the above text to modify the response to help head2head
 
 % Last Modified by GUIDE v2.5 14-Jan-2018 10:33:53
 
@@ -28,8 +28,8 @@
 gui_Singleton = 1;
 gui_State = struct('gui_Name',       mfilename, ...
                    'gui_Singleton',  gui_Singleton, ...
-                   'gui_OpeningFcn', @Questionbuilder_OpeningFcn, ...
-                   'gui_OutputFcn',  @Questionbuilder_OutputFcn, ...
+                   'gui_OpeningFcn', @head2head_OpeningFcn, ...
+                   'gui_OutputFcn',  @head2head_OutputFcn, ...
                    'gui_LayoutFcn',  [] , ...
                    'gui_Callback',   []);
 if nargin && ischar(varargin{1})
@@ -44,15 +44,15 @@ end
 % End initialization code - DO NOT EDIT
 
 
-% --- Executes just before Questionbuilder is made visible.
-function Questionbuilder_OpeningFcn(hObject, eventdata, handles, varargin)
+% --- Executes just before head2head is made visible.
+function head2head_OpeningFcn(hObject, eventdata, handles, varargin)
 % This function has no output args, see OutputFcn.
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA
-% varargin   command line arguments to Questionbuilder (see VARARGIN)
+% varargin   command line arguments to head2head (see VARARGIN)
 
-% Choose default command line output for Questionbuilder
+% Choose default command line output for head2head
 handles.Ccurrent=0;
 handles.qtime = 5;
 t = timer;
@@ -66,13 +66,14 @@ t.ExecutionMode = 'fixedRate';
 handles.timerh = t;
 
 
-h = findobj('Tag','chasebackground');
-    if ~isempty(h)
-        handchase = guidata(h);
-        handles.score = handchase.score;
-    else
-        handles.score = 5000;
-    end
+% h = findobj('Tag','chasebackground');
+%     if ~isempty(h)
+%         handchase = guidata(h);
+%         handles.score = handchase.score;
+%     else
+%         handles.score = 5000;
+%     end
+handles.score = 0;
 handles.output = hObject;
 handles.step2.String = num2str(handles.score+20000);
 handles.step3.String = num2str(handles.score);
@@ -89,13 +90,13 @@ handles.started = false;
 
 guidata(hObject, handles);
 
-% UIWAIT makes Questionbuilder wait for user response (see UIRESUME)
+% UIWAIT makes head2head wait for user response (see UIRESUME)
 % uiwait(handles.h2h);
 
 
 
 % --- Outputs from this function are returned to the command line.
-function varargout = Questionbuilder_OutputFcn(hObject, eventdata, handles) 
+function varargout = head2head_OutputFcn(hObject, eventdata, handles) 
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -144,6 +145,8 @@ try
 if strcmp(handles.pushbutton1.String{1},handles.correctanswer{1})
 %     msgbox('right')
     handles = usrmoveup(hObject);
+    
+
 else
    stop(handles.timerh);
    uiwait( msgbox('wrong'))
@@ -153,6 +156,9 @@ catch
     1
 end
 handles = chrmoveup(hObject);
+
+
+
 guidata(hObject, handles);
 
 
@@ -171,6 +177,8 @@ try
 if strcmp(handles.pushbutton2.String{1},handles.correctanswer{1})
 %     msgbox('right')
     handles = usrmoveup(hObject);
+    
+
 else
     stop(handles.timerh);
     uiwait(msgbox('wrong'))
@@ -196,6 +204,7 @@ try
 if strcmp(handles.pushbutton3.String{1},handles.correctanswer{1})
 %     msgbox('right')
     handles = usrmoveup(hObject);
+      
 else
     stop(handles.timerh);
     uiwait(msgbox('wrong'))
@@ -215,24 +224,29 @@ h.BackgroundColor = [0 1 1];
 h.String='';
 handles.current = handles.current+1;
 
-if handles.current == 8
-    hhost = findobj('Tag','chasebackground');
-    if ~isempty(hhost)
-        hhost.score = hhost.score + handles.score;
-        hhost.cashreward.String = ['£' num2str(hhost.score)];
-    end
-    
-    msgbox('Contestant Won');
-
-    hclient = findobj('Tag','h2h');
-    if ~isempty(hclient)
-        close(hclient);
-    end
+if handles.current > 7
+        hhost = findobj('Tag','chasebackground');
+        if ~isempty(hhost)
+            hhosthand = guidata(hhost);
+            hhosthand.score = hhosthand.score + handles.score;
+            hhosthand.cashreward.String = ['£' num2str(hhosthand.score)];
+            guidata(hhost,hhosthand);
+        end
+        msgbox('Contestant Won');
+        hclient = findobj('Tag','h2h');
+        if ~isempty(hclient)
+            close(hclient);
+        end
 end
 
+
+guidata(hObject,handles)
 h = findobj('Tag',['step' num2str(handles.current)]);
 h.BackgroundColor = [0 1 0];
 h.String = handles.score;
+
+
+
 guidata(hObject,handles);
 
 
@@ -251,7 +265,28 @@ if randi([0,1]) == 1
     h = findobj('Tag',['step' num2str(handles.Ccurrent)]);
     if ~isempty(h)
     h.BackgroundColor = [1 0 0];
+    h.String='Chaser';
     if handles.Ccurrent==handles.current
+        hhost = findobj('Tag','chasebackground');
+        if ~isempty(hhost)
+            hhosthand = guidata(hhost);
+            switch hhosthand.contnum
+                case 1
+                    hhosthand.contestant1.Visible = 'off';
+                    hhosthand.status(1) = 0;
+                case 2
+                    hhosthand.contestant2.Visible = 'off';
+                    hhosthand.status(2) = 0;
+                case 3
+                    hhosthand.contestant3.Visible = 'off';
+                    hhosthand.status(3) = 0;
+                case 4
+                    hhosthand.contestant4.Visible = 'off';
+                    hhosthand.status(4) = 0;
+            end 
+            hhosthand.cashreward.String = ['£' num2str(hhosthand.score)];
+            guidata(hhost,hhosthand);
+        end
         msgbox('Chaser Won');
         h.String = handles.score;
         
@@ -261,6 +296,7 @@ if randi([0,1]) == 1
         if ~isempty(hclient)
             close(hclient);
         end
+        
 
 
     end

@@ -22,7 +22,7 @@ function varargout = THECHASEgame(varargin)
 
 % Edit the above text to modify the response to help THECHASEgame
 
-% Last Modified by GUIDE v2.5 20-Dec-2017 07:56:58
+% Last Modified by GUIDE v2.5 15-Jan-2018 03:16:20
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -54,7 +54,20 @@ function THECHASEgame_OpeningFcn(hObject, eventdata, handles, varargin)
 
 % Choose default command line output for THECHASEgame
 handles.output = hObject;
-
+handles.score = 0;
+handles.played = 0;
+handles.status = ones(4,1);
+handles.cashreward.String = ['£' num2str(handles.score)];
+handles.cont1cb = 0;
+handles.cont2cb = 0;
+handles.cont3cb = 0;
+handles.cont4cb = 0;
+handles.cont1hh = 0;
+handles.cont2hh = 0;
+handles.cont3hh = 0;
+handles.cont4hh = 0;
+handles.pushbutton22.Enable = 'off'
+handles.pushbutton23.Enable = 'off'
 % Update handles structure
 guidata(hObject, handles);
 
@@ -75,9 +88,18 @@ varargout{1} = handles.output;
 
 % --- Executes on button press in contestant1.
 function contestant1_Callback(hObject, eventdata, handles)
+handles.played = handles.played +1 ;
 % hObject    handle to contestant1 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+% handles    structure with handles and user data (see GUIDATA);
+handles.contnum = 1;
+guidata(hObject,handles);
+cashbuilder;
+hObject.Enable='off';
+guidata(hObject,handles);
+if handles.played == 4
+    handles.pushbutton22.Enable = 'on'
+end
 
 
 % --- Executes on button press in contestant4.
@@ -85,6 +107,16 @@ function contestant4_Callback(hObject, eventdata, handles)
 % hObject    handle to contestant4 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+handles.played = handles.played +1 ;
+handles.contnum = 4;
+guidata(hObject,handles);
+cashbuilder;
+hObject.Enable='off';
+guidata(hObject,handles);
+if handles.played == 4
+    handles.pushbutton22.Enable = 'on'
+end
+
 
 
 % --- Executes on button press in contestant3.
@@ -92,6 +124,17 @@ function contestant3_Callback(hObject, eventdata, handles)
 % hObject    handle to contestant3 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+handles.played = handles.played +1 ;
+handles.contnum = 3;
+guidata(hObject,handles);
+cashbuilder;
+hObject.Enable='off';
+guidata(hObject,handles);
+if handles.played == 4
+    handles.pushbutton22.Enable = 'on'
+    
+end
+
 
 
 % --- Executes on button press in contestant2.
@@ -99,6 +142,22 @@ function contestant2_Callback(hObject, eventdata, handles)
 % hObject    handle to contestant2 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+handles.played = handles.played +1 ;
+handles.contnum = 2;
+guidata(hObject,handles);
+cashbuilder;
+hObject.Enable='off'
+guidata(hObject,handles);
+if handles.played == 4
+    handles.pushbutton22.Enable = 'on'
+end
+
+function final_chaser(hObject, eventdata, handles)
+% THECHASEgame('final_chaser',hObject,eventdata,guidata(hObject))
+
+disp('youwon');
+
+
 
 
 % --- Executes on button press in cashreward.
@@ -113,3 +172,35 @@ function uitable3_DeleteFcn(hObject, eventdata, handles)
 % hObject    handle to uitable3 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+
+% --- Executes on button press in pushbutton22.
+function pushbutton22_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton22 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+if handles.played == 4
+final_round;
+ handles.pushbutton23.Enable = 'on';
+end
+
+
+% --- Executes on button press in pushbutton23.
+function pushbutton23_Callback(hObject, eventdata, handles)
+% hObject    handle to pushbutton23 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+steps = sum(handles.uitable3.Data(1,:));
+res = randi([steps-2 steps+1]);
+
+for i = 1:res
+    pause(1)
+    handles.uitable3.Data(2,i)=1;
+end
+
+result= sum(handles.uitable3.Data,2)
+if result(1)>result(2)
+    msgbox(sprintf('Contestants won %d Euros',handles.score));
+else
+    msgbox(sprintf('Contestants lost. Better luck next time'));
+end

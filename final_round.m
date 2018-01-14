@@ -1,26 +1,26 @@
-function varargout = cashbuilder(varargin)
-% CASHBUILDER MATLAB code for cashbuilder.fig
-%      CASHBUILDER, by itself, creates a new CASHBUILDER or raises the existing
+function varargout = final_round(varargin)
+% final_round MATLAB code for final_round.fig
+%      final_round, by itself, creates a new final_round or raises the existing
 %      singleton*.
 %
-%      H = CASHBUILDER returns the handle to a new CASHBUILDER or the handle to
+%      H = final_round returns the handle to a new final_round or the handle to
 %      the existing singleton*.
 %
-%      CASHBUILDER('CALLBACK',hObject,eventData,handles,...) calls the local
-%      function named CALLBACK in CASHBUILDER.M with the given input arguments.
+%      final_round('CALLBACK',hObject,eventData,handles,...) calls the local
+%      function named CALLBACK in final_round.M with the given input arguments.
 %
-%      CASHBUILDER('Property','Value',...) creates a new CASHBUILDER or raises the
+%      final_round('Property','Value',...) creates a new final_round or raises the
 %      existing singleton*.  Starting from the left, property value pairs are
-%      applied to the GUI before cashbuilder_OpeningFcn gets called.  An
+%      applied to the GUI before final_round_OpeningFcn gets called.  An
 %      unrecognized property name or invalid value makes property application
-%      stop.  All inputs are passed to cashbuilder_OpeningFcn via varargin.
+%      stop.  All inputs are passed to final_round_OpeningFcn via varargin.
 %
 %      *See GUI Options on GUIDE's Tools menu.  Choose "GUI allows only one
 %      instance to run (singleton)".
 %
 % See also: GUIDE, GUIDATA, GUIHANDLES
 
-% Edit the above text to modify the response to help cashbuilder
+% Edit the above text to modify the response to help final_round
 
 % Last Modified by GUIDE v2.5 11-Jan-2018 16:18:28
 
@@ -28,8 +28,8 @@ function varargout = cashbuilder(varargin)
 gui_Singleton = 1;
 gui_State = struct('gui_Name',       mfilename, ...
                    'gui_Singleton',  gui_Singleton, ...
-                   'gui_OpeningFcn', @cashbuilder_OpeningFcn, ...
-                   'gui_OutputFcn',  @cashbuilder_OutputFcn, ...
+                   'gui_OpeningFcn', @final_round_OpeningFcn, ...
+                   'gui_OutputFcn',  @final_round_OutputFcn, ...
                    'gui_LayoutFcn',  [] , ...
                    'gui_Callback',   []);
 if nargin && ischar(varargin{1})
@@ -44,31 +44,36 @@ end
 % End initialization code - DO NOT EDIT
 
 
-% --- Executes just before cashbuilder is made visible.
-function cashbuilder_OpeningFcn(hObject, eventdata, handles, varargin)
+% --- Executes just before final_round is made visible.
+function final_round_OpeningFcn(hObject, eventdata, handles, varargin)
 % This function has no output args, see OutputFcn.
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-% varargin   command line arguments to cashbuilder (see VARARGIN)
+% varargin   command line arguments to final_round (see VARARGIN)
 
-% Choose default command line output for cashbuilder
+% Choose default command line output for final_round
 
 
-handles.tot_time = 10;
+handles.tot_time = 15;
 handles.counter = handles.tot_time;
 handles.output = hObject;
-handles.questions_file = fopen('questions.txt','r');
-handles.score = 0;
+handles.questions_file = fopen('questions3.txt','r');
+
 handles.started = false;
 
 
 hhost = findobj('Tag','chasebackground');
 if ~isempty(hhost)
 hhosthandles = guidata(hhost);
-handles.contnum = hhosthandles.contnum;
+
+handles.step = max(1,sum(hhosthandles.status));
+
 guidata(hhost,hhosthandles)
+else
+    handles.step = 2;
 end
+handles.text3.String = num2str(handles.step);
 
 
 t = timer;
@@ -84,11 +89,11 @@ handles.timerh = t;
 % Update handles structure
 guidata(hObject, handles);
 
-% UIWAIT makes cashbuilder wait for user response (see UIRESUME)
+% UIWAIT makes final_round wait for user response (see UIRESUME)
 % uiwait(handles.Gui1);
 
 % --- Outputs from this function are returned to the command line.
-function varargout = cashbuilder_OutputFcn(hObject, eventdata, handles) 
+function varargout = final_round_OutputFcn(hObject, eventdata, handles) 
 % varargout  cell array for returning output args (see VARARGOUT);
 % hObject    handle to figure
 % eventdata  reserved - to be defined in a future version of MATLAB
@@ -96,7 +101,7 @@ function varargout = cashbuilder_OutputFcn(hObject, eventdata, handles)
 
 % Get default command line output from handles structure
 varargout{1} = handles.output;
-varargout{2} = handles.score;
+% varargout{2} = handles.step;
 
 if handles.started == true
     handles.text5.String = toc;
@@ -115,14 +120,14 @@ function closegui
 hObject = findobj('Tag','Gui1');
 if ~isempty(hObject)
     handles = guidata(hObject);
-    head2head;
-    h2hObj = findobj('Tag','h2h');
+%     head2head;
+    h2hObj = findobj('Tag','chasebackground');
     if ~isempty(h2hObj)
         h2hHand = guidata(h2hObj);
-        h2hHand.score=handles.score;
-        h2hHand.step2.String = num2str(h2hHand.score+20000);
-        h2hHand.step3.String = num2str(h2hHand.score);
-        h2hHand.step4.String = num2str(max(h2hHand.score-2000,-1000));
+        data = h2hHand.uitable3.Data;
+        data(1,1:handles.step) = 1;
+        h2hHand.uitable3.Data = data;
+        h2hHand.pushbutton23.Enable = 'on';
         guidata(h2hObj,h2hHand);
     end
 
@@ -162,32 +167,27 @@ function pushbutton1_Callback(hObject, eventdata, handles)
 
 time = toc;
 if time>handles.tot_time && handles.started == true
-    cashbuilder_OutputFcn(hObject, eventdata, handles)
+    final_round_OutputFcn(hObject, eventdata, handles)
 end
     
 handles.question
 handles.answer
 if strcmp(strip(handles.answer),handles.edit1.String)
-    handles.score = handles.score + 1000;
-    handles.text3.String = num2str(handles.score);
+    handles.step = handles.step + 1;
+    handles.text3.String = num2str(handles.step);
     guidata(hObject,handles);
     display_question(hObject);
     
     h = findobj('Tag','chasebackground');
     if ~isempty(h)
         chasedata = guidata(h);
-%         chasedata.cashreward.String = ['£' num2str(handles.score)];
-        switch handles.contnum
-            case 1
-                chasedata.cont1cb = handles.score;
-            case 2
-                chasedata.cont2cb = handles.score;
-            case 3
-                chasedata.cont3cb = handles.score;
-            case 4
-                chasedata.cont4cb = handles.score ;
-        end
+%         chasedata.cashreward.String = ['£' num2str(handles.step)];
+    
+        data = chasedata.uitable3.Data;
+        data(1,1:handles.step) = 1;
+        chasedata.uitable3.Data = data;
         guidata(h,chasedata);
+   
 %         hhost = findobj('Tag','chasebackground');
 % if ~isempty(hhost)
 %     hhosthandles= guidata(hhost);

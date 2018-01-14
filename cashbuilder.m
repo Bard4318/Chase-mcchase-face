@@ -53,17 +53,37 @@ function cashbuilder_OpeningFcn(hObject, eventdata, handles, varargin)
 % varargin   command line arguments to cashbuilder (see VARARGIN)
 
 % Choose default command line output for cashbuilder
+
+
+handles.tot_time = 10;
+handles.counter = handles.tot_time;
 handles.output = hObject;
 handles.questions_file = fopen('questions.txt','r');
 handles.score = 0;
 handles.started = false;
+
+
+hhost = findobj('Tag','chasebackground')
+if ~isempty(hhost)
+hhosthandles = guidata(hhost)
+handles.contnum = hhosthandles.contnum;
+end
+
+t = timer;
+% t.StartFcn = {@updateclock,hObject};
+t.TimerFcn = @(~,~)updateclock;
+t.StopFcn = @(~,~)closegui;
+t.Period = 1;
+t.TasksToExecute = handles.tot_time;
+t.ExecutionMode = 'fixedRate';
+handles.timerh = t;
+
 
 % Update handles structure
 guidata(hObject, handles);
 
 % UIWAIT makes cashbuilder wait for user response (see UIRESUME)
 % uiwait(handles.Gui1);
-
 
 % --- Outputs from this function are returned to the command line.
 function varargout = cashbuilder_OutputFcn(hObject, eventdata, handles) 
@@ -75,14 +95,35 @@ function varargout = cashbuilder_OutputFcn(hObject, eventdata, handles)
 % Get default command line output from handles structure
 varargout{1} = handles.output;
 varargout{2} = handles.score;
-h = findobj('Tag','chasebackground');
-if ~isempty(h)
-    chasedata = guidata(h);
-    set(chasedata,'score',handles.score);
-    
-    
+
+if handles.started == true
+    handles.text5.String = toc;
 end
+    
+    
         
+function updateclock
+hObject = findobj('Tag','Gui1');
+if ~isempty(hObject)
+    handles = guidata(hObject);
+    handles.text5.String = num2str(str2double(handles.text5.String)-1);
+end
+
+function closegui
+
+hObject = findobj('Tag','Gui1');
+handles = guidata(hObject);
+hhost = findobj('Tag','chasebackground');
+
+if ~isempty(hhost)
+    hhosthandles= guidata(hhost);
+    set(hhosthandles,['cont' num2str(handles.contnum) 'cb'],handles.score)
+end
+
+hObject = findobj('Tag','Gui1');
+if ~isempty(hObject)
+    close(hObject) 
+end
 
 
 
@@ -113,6 +154,12 @@ function pushbutton1_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton1 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+time = toc;
+if time>handles.tot_time && handles.started == true
+    cashbuilder_OutputFcn(hObject, eventdata, handles)
+end
+    
 handles.question
 handles.answer
 if strcmp(strip(handles.answer),handles.edit1.String)
@@ -120,6 +167,14 @@ if strcmp(strip(handles.answer),handles.edit1.String)
     handles.text3.String = num2str(handles.score);
     guidata(hObject,handles);
     display_question(hObject);
+    
+    h = findobj('Tag','chasebackground');
+    if ~isempty(h)
+        chasedata = guidata(h);
+%         chasedata.cashreward.String = ['£' num2str(handles.score)];
+        chasedata.score = handles.score;
+    end
+    
 else
     display_question(hObject);
 end
@@ -136,18 +191,23 @@ guidata(hObject, handles);
 
 
 
-
-
 % --- Executes on button press in pushbutton2.
 function pushbutton2_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton2 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+tic;
 if handles.started == false
     display_question(hObject);
     handles = guidata(hObject);
     handles.started = true;  
+    handles.text5.String = num2str(handles.counter);
+    start(handles.timerh);    
 end
+
+
+
+
 guidata(hObject,handles)
 
 
